@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>For Mi Vida 💕</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:    #130824;
+  --bg2:   #1f0d38;
+  --pink:  #ff5fa0;
+  --pink2: #ff3d8a;
+  --soft:  #ffb3d9;
+  --purp:  #8b2fff;
+  --gold:  #ffd166;
+  --white: #ffffff;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Quicksand',sans-serif;color:var(--white);}
+
+/* ═══ CANVAS BG ═══ */
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ═══ SCREENS ═══ */
+.screen{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px 22px;z-index:10;
+  opacity:0;pointer-events:none;
+  transition:opacity .55s cubic-bezier(.4,0,.2,1), transform .55s cubic-bezier(.4,0,.2,1);
+  transform:translateY(40px) scale(.96);
+}
+.screen.active{opacity:1;pointer-events:auto;transform:translateY(0) scale(1);}
+.screen.out{opacity:0;transform:translateY(-40px) scale(1.03);pointer-events:none;}
+
+/* ═══ SHARED TITLE ═══ */
+.title{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(1.9rem,7vw,2.8rem);
+  text-align:center;
+  text-shadow:0 0 28px rgba(255,95,160,.7);
+  margin-bottom:18px;
+}
+.subtitle{color:rgba(255,255,255,.65);font-size:.95rem;text-align:center;margin-bottom:22px;}
+
+/* ═══ BUTTON ═══ */
+.btn{
+  background:linear-gradient(135deg,var(--pink),var(--pink2));
+  color:#fff;border:none;border-radius:50px;
+  padding:15px 40px;font-size:1rem;font-weight:700;
+  font-family:'Quicksand',sans-serif;cursor:pointer;
+  box-shadow:0 0 28px rgba(255,95,160,.55),0 4px 18px rgba(0,0,0,.3);
+  transition:transform .15s,box-shadow .15s;
+  animation:btnPulse 2.6s ease-in-out infinite;
+}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 0 28px rgba(255,95,160,.5);}
+  50%{box-shadow:0 0 52px rgba(255,95,160,.9),0 0 80px rgba(255,95,160,.3);}
+}
+.btn:active{transform:scale(.95);}
+.btn:hover{transform:scale(1.04);}
+
+/* ══════════════════════════════
+   S1 — HEY Mi Vida
+══════════════════════════════ */
+#s1 .blob{
+  width:140px;height:140px;margin-bottom:6px;position:relative;
+  animation:blobBounce 2.5s ease-in-out infinite;
+}
+@keyframes blobBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+.hcluster{position:absolute;top:-18px;right:-22px;display:flex;gap:3px;
+  animation:hcFloat 3.2s ease-in-out infinite;}
+@keyframes hcFloat{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-9px) rotate(5deg);}}
+
+/* ══════════════════════════════
+   S2 — CUTENESS METER
+══════════════════════════════ */
+.meter-lbl{font-size:1.05rem;color:rgba(255,255,255,.8);margin-bottom:16px;letter-spacing:.04em;}
+.pct-num{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(4.5rem,20vw,7rem);
+  text-shadow:0 0 40px rgba(255,95,160,.9);
+  line-height:1;
+}
+.bar-wrap{width:min(320px,82vw);height:10px;background:rgba(255,255,255,.1);border-radius:99px;
+  margin-top:20px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:99px;width:0;transition:width .1s linear;
+  background:linear-gradient(90deg,var(--purp),var(--pink),var(--pink2));
+  box-shadow:0 0 14px var(--pink);}
+.warn-box{
+  margin-top:20px;padding:10px 22px;border-radius:12px;
+  background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.4);
+  color:var(--gold);font-weight:700;font-size:.88rem;letter-spacing:.08em;
+  opacity:0;transform:scale(.8);transition:all .5s cubic-bezier(.34,1.56,.64,1);
+}
+.warn-box.show{opacity:1;transform:scale(1);}
+
+/* ══════════════════════════════
+   S3 — ENVELOPE
+══════════════════════════════ */
+.env-wrap{cursor:pointer;animation:envFloat 3s ease-in-out infinite;margin-bottom:10px;}
+@keyframes envFloat{0%,100%{transform:translateY(0) rotate(-1.5deg);}50%{transform:translateY(-13px) rotate(1.5deg);}}
+.env-wrap:active{animation:none;transform:scale(.95);}
+.tap-row{display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;margin-top:6px;}
+.tap-circle{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--pink2));
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+  box-shadow:0 0 32px rgba(255,95,160,.7);
+  animation:tapPulse 1.9s ease-in-out infinite;
+}
+@keyframes tapPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+.tap-row span{color:rgba(255,255,255,.55);font-size:.9rem;}
+
+/* ══════════════════════════════
+   S4 — FLIP REVEAL CARDS
+══════════════════════════════ */
+.rc-title{font-family:'Dancing Script',cursive;font-size:clamp(1.5rem,5.5vw,2rem);
+  text-align:center;margin-bottom:20px;}
+.rc-bigheart{font-size:2.6rem;margin-bottom:4px;animation:hbeat 1.5s ease-in-out infinite;}
+@keyframes hbeat{0%,100%{transform:scale(1);}14%{transform:scale(1.35);}28%{transform:scale(1);}42%{transform:scale(1.2);}60%{transform:scale(1);}}
+
+.cards-grid{display:flex;flex-direction:column;gap:13px;width:min(360px,90vw);}
+
+/* Flip card */
+.flip-card{
+  width:100%;height:72px;perspective:900px;cursor:pointer;
+  opacity:0;transform:translateX(-28px);
+}
+.flip-card.slide-in{animation:slideIn .5s forwards;}
+@keyframes slideIn{to{opacity:1;transform:translateX(0);}}
+
+.flip-inner{
+  width:100%;height:100%;position:relative;
+  transform-style:preserve-3d;
+  transition:transform .55s cubic-bezier(.4,0,.2,1);
+}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+
+.flip-front,.flip-back{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border-radius:16px;display:flex;align-items:center;padding:16px 20px;
+  font-weight:700;font-size:.95rem;line-height:1.35;
+}
+.flip-front{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,95,160,.25);
+  justify-content:center;
+  color:rgba(255,255,255,.4);font-style:italic;font-size:.85rem;letter-spacing:.05em;
+}
+.flip-front::before{content:'';position:absolute;inset:0;border-radius:16px;
+  background:linear-gradient(135deg,rgba(139,47,255,.08),rgba(255,95,160,.08));}
+.flip-back{
+  background:linear-gradient(135deg,rgba(255,95,160,.22),rgba(139,47,255,.18));
+  border:1px solid rgba(255,95,160,.5);
+  transform:rotateY(180deg);color:var(--white);
+  box-shadow:inset 0 0 20px rgba(255,95,160,.15);
+}
+.lock-icon{font-size:1.4rem;margin-right:10px;}
+
+/* ══════════════════════════════
+   S5 — REASONS I LOVE YOU
+══════════════════════════════ */
+.reasons-list{
+  display:flex;flex-direction:column;gap:10px;
+  width:min(360px,90vw);max-height:55vh;overflow-y:auto;
+  padding-right:4px;
+}
+.reasons-list::-webkit-scrollbar{width:3px;}
+.reasons-list::-webkit-scrollbar-track{background:transparent;}
+.reasons-list::-webkit-scrollbar-thumb{background:rgba(255,95,160,.4);border-radius:99px;}
+.reason-item{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,95,160,.2);
+  border-radius:14px;padding:13px 16px;
+  display:flex;align-items:center;gap:12px;
+  opacity:0;transform:translateX(28px);
+}
+.reason-item.pop{animation:rpop .4s forwards;}
+@keyframes rpop{to{opacity:1;transform:translateX(0);}}
+.reason-icon{font-size:1.4rem;flex-shrink:0;}
+.reason-text{font-size:.9rem;font-weight:600;color:rgba(255,255,255,.9);}
+
+/* ══════════════════════════════
+   S6 — SORRY NOTE (better cat)
+══════════════════════════════ */
+.note-card{
+  background:rgba(255,235,248,.96);border-radius:24px;
+  padding:26px 22px 20px;width:min(360px,90vw);
+  box-shadow:0 0 60px rgba(255,95,160,.35),0 20px 60px rgba(0,0,0,.5);
+  text-align:center;
+}
+.note-card p{
+  font-family:'Dancing Script',cursive;font-size:1.1rem;
+  color:#3a1040;line-height:1.7;margin-bottom:12px;
+}
+.note-card .btn{margin-top:8px;font-size:.95rem;}
+
+/* ══════════════════════════════
+   S7 — PINKY PROMISE
+══════════════════════════════ */
+.promise-box{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,95,160,.3);
+  border-radius:20px;padding:24px 22px;width:min(360px,90vw);text-align:center;
+}
+.pinky-svg{width:180px;margin:0 auto 16px;display:block;
+  animation:pinkyWiggle 2.5s ease-in-out infinite;}
+@keyframes pinkyWiggle{0%,100%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}}
+.promise-box p{font-size:1rem;font-weight:600;color:rgba(255,255,255,.85);line-height:1.6;margin-bottom:16px;}
+
+/* ══════════════════════════════
+   S8 — CELEBRATION / FINAL
+══════════════════════════════ */
+.final-char{width:160px;margin-bottom:8px;animation:finalJump 1.4s ease-in-out infinite;}
+@keyframes finalJump{0%,100%{transform:translateY(0);}50%{transform:translateY(-18px);}}
+.final-msg{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(2rem,8vw,3rem);text-align:center;
+  text-shadow:0 0 30px rgba(255,95,160,.8);margin-bottom:10px;
+}
+.final-sub{color:rgba(255,255,255,.7);font-size:.95rem;text-align:center;}
+
+/* ══════════════════════════════
+   CONFETTI
+══════════════════════════════ */
+.cf-wrap{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden;}
+.cf{position:absolute;top:-12px;border-radius:2px;
+  animation:cfDrop var(--d) ease-in forwards;opacity:0;}
+@keyframes cfDrop{
+  0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1);}
+  100%{opacity:0;transform:translateY(110vh) rotate(720deg) scale(.4);}
+}
+
+/* Particle */
+.part{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:300;
+  animation:partBurst .65s ease-out forwards;}
+@keyframes partBurst{
+  0%{opacity:1;transform:translate(0,0) scale(1);}
+  100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0);}
+}
+
+/* Fade-up utility */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+.fu{opacity:0;animation:fadeUp .7s forwards;}
+.fu1{animation-delay:.1s;} .fu2{animation-delay:.25s;}
+.fu3{animation-delay:.4s;} .fu4{animation-delay:.55s;}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="cf-wrap" id="cfWrap"></div>
+
+<!-- ═══════════════ S1: HEY Mi Vida ═══════════════ -->
+<div class="screen active" id="s1">
+  <div class="blob fu fu1" style="width:145px;height:145px;margin-bottom:10px;position:relative;">
+    <svg viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg" width="145" height="145">
+      <circle cx="65" cy="52" r="36" fill="#fff5fa" stroke="#2a1020" stroke-width="2.2"/>
+      <ellipse cx="65" cy="88" rx="28" ry="22" fill="#fff5fa" stroke="#2a1020" stroke-width="2.2"/>
+      <!-- ears -->
+      <path d="M37 30 L29 12 L46 26Z" fill="#fff5fa" stroke="#2a1020" stroke-width="2"/>
+      <path d="M39 28 L33 16 L44 24Z" fill="#ffb0cc"/>
+      <path d="M93 30 L101 12 L84 26Z" fill="#fff5fa" stroke="#2a1020" stroke-width="2"/>
+      <path d="M91 28 L97 16 L86 24Z" fill="#ffb0cc"/>
+      <!-- cheeks -->
+      <ellipse cx="50" cy="56" rx="7" ry="5" fill="#ffb0cc" opacity=".55"/>
+      <ellipse cx="80" cy="56" rx="7" ry="5" fill="#ffb0cc" opacity=".55"/>
+      <!-- eyes -->
+      <ellipse cx="56" cy="48" rx="4" ry="4.5" fill="#2a1020"/>
+      <ellipse cx="74" cy="48" rx="4" ry="4.5" fill="#2a1020"/>
+      <circle cx="57.5" cy="46.5" r="1.5" fill="white"/>
+      <circle cx="75.5" cy="46.5" r="1.5" fill="white"/>
+      <!-- smile -->
+      <path d="M57 61 Q65 67 73 61" stroke="#2a1020" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <!-- nose -->
+      <ellipse cx="65" cy="57" rx="2.5" ry="1.8" fill="#ffb0cc"/>
+      <!-- arm wave -->
+      <path d="M93 90 Q112 76 106 60" stroke="#fff5fa" stroke-width="12" stroke-linecap="round"/>
+      <path d="M93 90 Q112 76 106 60" stroke="#2a1020" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <!-- hand dots -->
+      <circle cx="107" cy="58" r="5" fill="#fff5fa" stroke="#2a1020" stroke-width="2"/>
+    </svg>
+    <div class="hcluster">
+      <span style="font-size:22px;transform:rotate(10deg)">💛</span>
+      <span style="font-size:30px">💕</span>
+      <span style="font-size:15px;transform:rotate(-8deg);margin-top:10px">✨</span>
+    </div>
+  </div>
+  <h1 class="title fu fu2">Hey Mi Vida, cutiepie</h1>
+  <p class="subtitle fu fu3">Do you even know how cute you are? 🤔</p>
+  <button class="btn fu fu4" onclick="goTo('s1','s2')">let's check 🤭🫣</button>
+</div>
+
+<!-- ═══════════════ S2: CUTENESS METER ═══════════════ -->
+<div class="screen" id="s2">
+  <div class="meter-lbl fu fu1">Measuring your cuteness... ⏳</div>
+  <div class="pct-num fu fu2" id="pctNum">0%</div>
+  <div class="bar-wrap fu fu2"><div class="bar-fill" id="barFill"></div></div>
+  <div class="warn-box" id="warnBox">⚠️ WARNING: TOO CUTE TO HANDLE</div>
+  <button class="btn" id="continueBtn" style="margin-top:22px;display:none;opacity:0" onclick="goTo('s2','s3')">Continue →</button>
+</div>
+
+<!-- ═══════════════ S3: ENVELOPE ═══════════════ -->
+<div class="screen" id="s3">
+  <h2 class="title fu fu1">A little note for you</h2>
+  <div class="env-wrap fu fu2" onclick="goTo('s3','s4')">
+    <svg viewBox="0 0 220 160" width="200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="eG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff9ee"/><stop offset="100%" stop-color="#ffecc0"/></linearGradient>
+        <linearGradient id="gG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe066"/><stop offset="100%" stop-color="#ffa500"/></linearGradient>
+        <filter id="eGlow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <ellipse cx="110" cy="158" rx="75" ry="6" fill="rgba(0,0,0,.22)"/>
+      <rect x="14" y="30" width="192" height="122" rx="12" fill="url(#eG)" stroke="url(#gG)" stroke-width="2.5" filter="url(#eGlow)"/>
+      <path d="M14 30 L110 94 L206 30" stroke="url(#gG)" stroke-width="2.2" fill="none"/>
+      <path d="M14 152 L78 92" stroke="url(#gG)" stroke-width="1.5" fill="none"/>
+      <path d="M206 152 L142 92" stroke="url(#gG)" stroke-width="1.5" fill="none"/>
+      <path d="M14 30 Q110 8 206 30 L110 86 Z" fill="#fde8b0" stroke="url(#gG)" stroke-width="2.2"/>
+      <path d="M34 42 Q70 32 106 40" stroke="rgba(255,255,255,.55)" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- heart seal -->
+      <circle cx="110" cy="92" r="10" fill="#ff5fa0"/>
+      <text x="110" y="97" text-anchor="middle" font-size="12">❤️</text>
+    </svg>
+  </div>
+  <div class="tap-row fu fu3" onclick="goTo('s3','s4')">
+    <div class="tap-circle">❤️</div>
+    <span>Tap to open</span>
+  </div>
+</div>
+
+<!-- ═══════════════ S4: FLIP REVEAL CARDS ═══════════════ -->
+<div class="screen" id="s4">
+  <div class="rc-bigheart fu fu1">💖✨</div>
+  <div class="rc-title fu fu2">Tap each card to reveal</div>
+  <div class="cards-grid">
+    <div class="flip-card" id="fc0" onclick="flipCard(this,0)">
+      <div class="flip-inner">
+        <div class="flip-front"><span class="lock-icon">🔒</span> tap to reveal</div>
+        <div class="flip-back">I messed up... and I'm really sorry for that 🥺💕</div>
+      </div>
+    </div>
+    <div class="flip-card" id="fc1" onclick="flipCard(this,1)">
+      <div class="flip-inner">
+        <div class="flip-front"><span class="lock-icon">🔒</span> tap to reveal</div>
+        <div class="flip-back">I promise I'll be better for you 🤞💗</div>
+      </div>
+    </div>
+    <div class="flip-card" id="fc2" onclick="flipCard(this,2)">
+      <div class="flip-inner">
+        <div class="flip-front"><span class="lock-icon">🔒</span> tap to reveal</div>
+        <div class="flip-back">Please forgive me... You mean so much to me, darling 🥲</div>
+      </div>
+    </div>
+  </div>
+  <button class="btn" id="seeMoreBtn" style="margin-top:20px;display:none;opacity:0" onclick="goTo('s4','s5')">See more →</button>
+</div>
+
+<!-- ═══════════════ S5: REASONS I LOVE YOU ═══════════════ -->
+<div class="screen" id="s5">
+  <h2 class="title fu fu1">Why you're my everything 💝</h2>
+  <div class="reasons-list" id="reasonsList">
+    <div class="reason-item"><span class="reason-icon">🌟</span><span class="reason-text">Your smile can fix any bad day instantly</span></div>
+    <div class="reason-item"><span class="reason-icon">🤗</span><span class="reason-text">You make me feel so safe and loved</span></div>
+    <div class="reason-item"><span class="reason-icon">🧠</span><span class="reason-text">You're the smartest person I know</span></div>
+    <div class="reason-item"><span class="reason-icon">💫</span><span class="reason-text">Everything feels better when you're around</span></div>
+    <div class="reason-item"><span class="reason-icon">🌸</span><span class="reason-text">You're kind, gentle and endlessly beautiful</span></div>
+    <div class="reason-item"><span class="reason-icon">🎵</span><span class="reason-text">Even your laugh is my favourite sound</span></div>
+    <div class="reason-item"><span class="reason-icon">💕</span><span class="reason-text">You are the best thing that happened to me</span></div>
+  </div>
+  <button class="btn fu fu4" style="margin-top:18px" onclick="goTo('s5','s6')">There's more →</button>
+</div>
+
+<!-- ═══════════════ S6: SORRY NOTE (BETTER CAT) ═══════════════ -->
+<div class="screen" id="s6">
+  <h2 class="title fu fu1">A little note for you</h2>
+  <div class="note-card fu fu2">
+    <!-- BETTER CRYING CAT SVG -->
+    <svg viewBox="0 0 140 160" width="110" style="margin:0 auto 14px;display:block;" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- body -->
+      <ellipse cx="70" cy="130" rx="35" ry="24" fill="#fffafa" stroke="#3a1a1a" stroke-width="2"/>
+      <!-- tail -->
+      <path d="M105 125 Q130 110 120 90 Q112 76 100 85" stroke="#fffafa" stroke-width="10" stroke-linecap="round" fill="none"/>
+      <path d="M105 125 Q130 110 120 90 Q112 76 100 85" stroke="#3a1a1a" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <!-- head -->
+      <circle cx="70" cy="74" r="38" fill="#fffafa" stroke="#3a1a1a" stroke-width="2.2"/>
+      <!-- ears -->
+      <path d="M42 48 L34 24 L54 42Z" fill="#fffafa" stroke="#3a1a1a" stroke-width="2"/>
+      <path d="M44 46 L38 28 L52 41Z" fill="#ffb8c8"/>
+      <path d="M98 48 L106 24 L86 42Z" fill="#fffafa" stroke="#3a1a1a" stroke-width="2"/>
+      <path d="M96 46 L102 28 L88 41Z" fill="#ffb8c8"/>
+      <!-- face markings / fur -->
+      <path d="M50 68 Q56 62 58 70" stroke="#e8d0d0" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      <path d="M90 68 Q84 62 82 70" stroke="#e8d0d0" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      <!-- cheeks blush -->
+      <ellipse cx="52" cy="82" rx="8" ry="5.5" fill="#ff9ab8" opacity=".45"/>
+      <ellipse cx="88" cy="82" rx="8" ry="5.5" fill="#ff9ab8" opacity=".45"/>
+      <!-- sad eyes — curved down -->
+      <path d="M56 68 Q60 63 64 68" stroke="#3a1a1a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M76 68 Q80 63 84 68" stroke="#3a1a1a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <!-- teary highlights -->
+      <circle cx="57" cy="67" r="2.5" fill="#3a1a1a"/>
+      <circle cx="57.8" cy="65.8" r="1.1" fill="white"/>
+      <circle cx="79" cy="67" r="2.5" fill="#3a1a1a"/>
+      <circle cx="79.8" cy="65.8" r="1.1" fill="white"/>
+      <!-- big tears rolling down -->
+      <path d="M57 72 Q55 80 56 88 Q57 92 60 90 Q62 88 61 82 Q60 76 57 72Z" fill="#a8d8ff" opacity=".85"/>
+      <path d="M79 72 Q81 80 80 88 Q79 92 76 90 Q74 88 75 82 Q76 76 79 72Z" fill="#a8d8ff" opacity=".85"/>
+      <!-- tear drops at bottom -->
+      <ellipse cx="58" cy="91" rx="3.5" ry="4.5" fill="#a8d8ff" opacity=".7"/>
+      <ellipse cx="78" cy="91" rx="3.5" ry="4.5" fill="#a8d8ff" opacity=".7"/>
+      <!-- nose -->
+      <path d="M67 78 L70 76 L73 78 Q70 81 67 78Z" fill="#ff9ab8"/>
+      <!-- sad mouth -->
+      <path d="M60 90 Q65 87 70 88 Q75 87 80 90" stroke="#3a1a1a" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <!-- whiskers left -->
+      <line x1="28" y1="76" x2="52" y2="79" stroke="#bba0a0" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="28" y1="82" x2="52" y2="82" stroke="#bba0a0" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="30" y1="88" x2="52" y2="85" stroke="#bba0a0" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- whiskers right -->
+      <line x1="112" y1="76" x2="88" y2="79" stroke="#bba0a0" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="112" y1="82" x2="88" y2="82" stroke="#bba0a0" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="110" y1="88" x2="88" y2="85" stroke="#bba0a0" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- paw tissue -->
+      <rect x="44" y="140" width="52" height="18" rx="6" fill="#ffd0e8" stroke="#3a1a1a" stroke-width="1.8"/>
+      <rect x="56" y="134" width="28" height="12" rx="5" fill="white" stroke="#3a1a1a" stroke-width="1.8"/>
+      <path d="M58 140 Q70 133 82 140" stroke="#3a1a1a" stroke-width="1.6" fill="none"/>
+      <!-- paw lines on tissue box -->
+      <text x="70" y="153" text-anchor="middle" font-size="9" fill="#cc88aa">🐾</text>
+      <!-- arm/paw holding tissue -->
+      <path d="M70 118 Q55 112 52 124" stroke="#fffafa" stroke-width="9" stroke-linecap="round" fill="none"/>
+      <path d="M70 118 Q55 112 52 124" stroke="#3a1a1a" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    </svg>
+    <p>I'm really sorry, my love. I accidentally upset the most precious and adorable person in my life — you. 🥺</p>
+    <p>Please forgive me if I hurt you or wasted even a little of your precious time. I promise I didn't mean to. 🥺💕</p>
+    <button class="btn" onclick="goTo('s6','s7')">I want to promise you something 🤞</button>
+  </div>
+</div>
+
+<!-- ═══════════════ S7: PINKY PROMISE ═══════════════ -->
+<div class="screen" id="s7">
+  <h2 class="title fu fu1">My Pinky Promise 🤞💕</h2>
+  <div class="promise-box fu fu2">
+    <svg class="pinky-svg" viewBox="0 0 180 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- left hand (pink) -->
+      <rect x="10" y="60" width="50" height="30" rx="12" fill="#ffb8c8" stroke="#3a1020" stroke-width="2"/>
+      <!-- left pinky up -->
+      <rect x="14" y="30" width="13" height="36" rx="6.5" fill="#ffb8c8" stroke="#3a1020" stroke-width="2"/>
+      <!-- left other fingers curled -->
+      <rect x="30" y="46" width="11" height="20" rx="5.5" fill="#ffb8c8" stroke="#3a1020" stroke-width="1.8"/>
+      <rect x="44" y="46" width="10" height="18" rx="5" fill="#ffb8c8" stroke="#3a1020" stroke-width="1.8"/>
+      <!-- knuckle dots left -->
+      <circle cx="20.5" cy="43" r="1.5" fill="rgba(255,255,255,.5)"/>
+      <circle cx="35.5" cy="51" r="1.5" fill="rgba(255,255,255,.5)"/>
+      <!-- right hand (lavender) -->
+      <rect x="120" y="60" width="50" height="30" rx="12" fill="#cca0ff" stroke="#3a1020" stroke-width="2"/>
+      <!-- right pinky up -->
+      <rect x="153" y="30" width="13" height="36" rx="6.5" fill="#cca0ff" stroke="#3a1020" stroke-width="2"/>
+      <!-- right other fingers curled -->
+      <rect x="139" y="46" width="11" height="20" rx="5.5" fill="#cca0ff" stroke="#3a1020" stroke-width="1.8"/>
+      <rect x="126" y="46" width="10" height="18" rx="5" fill="#cca0ff" stroke="#3a1020" stroke-width="1.8"/>
+      <!-- knuckle dots right -->
+      <circle cx="159.5" cy="43" r="1.5" fill="rgba(255,255,255,.5)"/>
+      <circle cx="144.5" cy="51" r="1.5" fill="rgba(255,255,255,.5)"/>
+      <!-- pinky link / hook -->
+      <path d="M27 30 Q90 8 153 30" stroke="#ff5fa0" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 4"/>
+      <!-- heart in middle -->
+      <text x="90" y="30" text-anchor="middle" font-size="18">💕</text>
+    </svg>
+    <p>I promise to always be there for you, to make you smile even on your hardest days, and to never make you feel anything less than the most loved person in the world. 💗</p>
+    <button class="btn" onclick="goTo('s7','s8')">I accept 💖</button>
+  </div>
+</div>
+
+<!-- ═══════════════ S8: FINAL CELEBRATION ═══════════════ -->
+<div class="screen" id="s8">
+  <div class="final-char fu fu1">
+    <svg viewBox="0 0 130 130" width="155" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="65" cy="50" r="36" fill="#fff5fa" stroke="#2a1020" stroke-width="2.2"/>
+      <ellipse cx="65" cy="86" rx="28" ry="21" fill="#fff5fa" stroke="#2a1020" stroke-width="2.2"/>
+      <path d="M37 28 L29 10 L46 24Z" fill="#fff5fa" stroke="#2a1020" stroke-width="2"/>
+      <path d="M39 26 L33 14 L44 22Z" fill="#ffb0cc"/>
+      <path d="M93 28 L101 10 L84 24Z" fill="#fff5fa" stroke="#2a1020" stroke-width="2"/>
+      <path d="M91 26 L97 14 L86 22Z" fill="#ffb0cc"/>
+      <ellipse cx="50" cy="54" rx="7" ry="5" fill="#ffb0cc" opacity=".55"/>
+      <ellipse cx="80" cy="54" rx="7" ry="5" fill="#ffb0cc" opacity=".55"/>
+      <!-- happy arc eyes -->
+      <path d="M52 45 Q56 40 60 45" stroke="#2a1020" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M70 45 Q74 40 78 45" stroke="#2a1020" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <!-- big happy mouth -->
+      <path d="M54 60 Q65 70 76 60" stroke="#2a1020" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <!-- rosy cheeks -->
+      <ellipse cx="49" cy="56" rx="7" ry="5" fill="#ff9ab8" opacity=".5"/>
+      <ellipse cx="81" cy="56" rx="7" ry="5" fill="#ff9ab8" opacity=".5"/>
+      <!-- nose -->
+      <ellipse cx="65" cy="56" rx="2.5" ry="1.8" fill="#ffb0cc"/>
+      <!-- both arms up -->
+      <path d="M37 90 Q22 72 30 56" stroke="#fff5fa" stroke-width="12" stroke-linecap="round" fill="none"/>
+      <path d="M37 90 Q22 72 30 56" stroke="#2a1020" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <path d="M93 90 Q108 72 100 56" stroke="#fff5fa" stroke-width="12" stroke-linecap="round" fill="none"/>
+      <path d="M93 90 Q108 72 100 56" stroke="#2a1020" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <!-- small stars around head -->
+      <text x="18" y="46" font-size="13">✨</text>
+      <text x="104" y="42" font-size="13">✨</text>
+      <text x="62" y="12" font-size="10">⭐</text>
+    </svg>
+  </div>
+  <div class="final-msg fu fu2">Yay! Thank you, love! 🎉💕</div>
+  <p class="final-sub fu fu3">You're the best thing ever. Always & forever. 🌸</p>
+  <div style="margin-top:20px;font-size:2rem;animation:hbeat 1.2s ease-in-out infinite;" class="fu fu4">💖💫💖</div>
+</div>
+
+<script>
+/* ══════════════ CANVAS PARTICLES BG ══════════════ */
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Dot {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.r = Math.random() * 1.8 + .4;
+    this.a = Math.random();
+    this.da = (Math.random() - .5) * .006;
+    this.dy = -(Math.random() * .15 + .05);
+  }
+  update() {
+    this.y += this.dy;
+    this.a += this.da;
+    if (this.a <= 0 || this.y < -4) this.reset();
+    if (this.a > 1) this.da *= -1;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,180,220,${this.a})`;
+    ctx.fill();
+  }
+}
+for (let i = 0; i < 100; i++) particles.push(new Dot());
+
+// Radial glow
+function drawGlow() {
+  const g1 = ctx.createRadialGradient(W*.2, H*.3, 0, W*.2, H*.3, W*.55);
+  g1.addColorStop(0, 'rgba(100,30,200,.22)'); g1.addColorStop(1, 'transparent');
+  ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+  const g2 = ctx.createRadialGradient(W*.8, H*.7, 0, W*.8, H*.7, W*.5);
+  g2.addColorStop(0, 'rgba(255,60,150,.16)'); g2.addColorStop(1, 'transparent');
+  ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+}
+
+function loop() {
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#130824'; ctx.fillRect(0,0,W,H);
+  drawGlow();
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* ══════════════ SCREEN TRANSITION ══════════════ */
+let current = 's1';
+function goTo(from, to) {
+  const f = document.getElementById(from);
+  const t = document.getElementById(to);
+  f.classList.add('out');
+  setTimeout(() => {
+    f.classList.remove('active','out');
+    t.classList.add('active');
+    current = to;
+    if (to === 's2') startMeter();
+    if (to === 's4') initFlipCards();
+    if (to === 's5') animateReasons();
+    if (to === 's8') { spawnConfetti(80); }
+  }, 520);
+}
+
+/* ══════════════ CUTENESS METER ══════════════ */
+function startMeter() {
+  const pct = document.getElementById('pctNum');
+  const bar = document.getElementById('barFill');
+  const wb  = document.getElementById('warnBox');
+  const cb  = document.getElementById('continueBtn');
+  let v = 0;
+  const go = setInterval(() => {
+    v = Math.min(v + (v < 90 ? .7 : .25), 120);
+    pct.textContent = Math.floor(v) + '%';
+    bar.style.width  = Math.min(v,100) + '%';
+    if (v >= 100) {
+      bar.style.background = 'linear-gradient(90deg,#8b2fff,#ff5fa0,#ffd166)';
+      bar.style.width = '100%';
+    }
+    if (v >= 120) {
+      clearInterval(go);
+      wb.classList.add('show');
+      spawnConfetti(40);
+      setTimeout(() => {
+        cb.style.display  = 'block';
+        cb.style.opacity  = '1';
+        cb.style.animation= 'fadeUp .6s forwards';
+      }, 700);
+    }
+  }, 22);
+}
+
+/* ══════════════ FLIP CARDS ══════════════ */
+let flippedCount = 0;
+function initFlipCards() {
+  flippedCount = 0;
+  ['fc0','fc1','fc2'].forEach((id,i) => {
+    const c = document.getElementById(id);
+    c.classList.remove('flipped','slide-in');
+    void c.offsetWidth;
+    setTimeout(() => c.classList.add('slide-in'), 120 + i*160);
+  });
+  document.getElementById('seeMoreBtn').style.display = 'none';
+  document.getElementById('seeMoreBtn').style.opacity = '0';
+}
+
+function flipCard(el, idx) {
+  if (el.classList.contains('flipped')) return;
+  el.classList.add('flipped');
+  flippedCount++;
+  burst(el);
+  if (flippedCount === 3) {
+    const b = document.getElementById('seeMoreBtn');
+    b.style.display = 'block';
+    setTimeout(() => { b.style.opacity='1'; b.style.animation='fadeUp .6s forwards'; }, 100);
+  }
+}
+
+function burst(el) {
+  const rect = el.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top  + rect.height/2;
+  const cols = ['#ff5fa0','#ffd166','#8b2fff','#f472b6','#a78bfa'];
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'part';
+    const a = (i/12)*Math.PI*2;
+    const d = 45+Math.random()*40;
+    p.style.cssText = `left:${cx}px;top:${cy}px;background:${cols[i%cols.length]};--tx:${Math.cos(a)*d}px;--ty:${Math.sin(a)*d}px;`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 700);
+  }
+}
+
+/* ══════════════ REASONS ANIMATE ══════════════ */
+function animateReasons() {
+  document.querySelectorAll('.reason-item').forEach((el,i) => {
+    el.classList.remove('pop');
+    void el.offsetWidth;
+    setTimeout(() => el.classList.add('pop'), 100 + i*110);
+  });
+}
+
+/* ══════════════ CONFETTI ══════════════ */
+function spawnConfetti(n) {
+  const wrap = document.getElementById('cfWrap');
+  const cols = ['#ff5fa0','#ffd166','#8b2fff','#f472b6','#60f','#0af','#f60'];
+  for (let i=0; i<n; i++) {
+    const c = document.createElement('div');
+    c.className = 'cf';
+    const sz = 6+Math.random()*8;
+    c.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${cols[~~(Math.random()*cols.length)]};--d:${1.3+Math.random()*1.8}s;animation-delay:${Math.random()*.5}s;border-radius:${Math.random()>.5?'50%':'3px'};`;
+    wrap.appendChild(c);
+    setTimeout(()=>c.remove(), 3000);
+  }
+}
+</script>
+</body>
+</html>
